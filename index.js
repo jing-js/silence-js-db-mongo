@@ -14,6 +14,14 @@ class MongoDatabaseStore {
     this._logLevel = (config.logLevel || this.logger.level).toLowerCase();
     this._logFilter = config.logFilter || null;
     this._closed = false;
+    this._onInitHandlers = [];
+  }
+  _onInit(handler) {
+    if (this._db !== null) {
+      handler(this._db);
+    } else {
+      this._onInitHandlers.push(handler);
+    }
   }
   init() {
     return new Promise((resolve, reject) => {
@@ -43,6 +51,10 @@ class MongoDatabaseStore {
               this.logger.swarn('mongodb', err.message);   
             }
           });
+
+          this._onInitHandlers.forEach(handler => handler(this._db));
+          this._onInitHandlers.length = 0;
+          
           resolve();
         }
       });
@@ -63,17 +75,6 @@ class MongoDatabaseStore {
   }
   command(cmd) {
     return this._db.command(cmd);
-  }
-  initField(field) {
-    field.type = field.type.toLowerCase();
-    if (field.type === 'binary') {
-      field.type = 'any';
-    } else if (['timestamp', 'int', 'integer'].indexOf(field.type) >= 0) {
-      field.type = 'number';
-    } else if (['string', 'boolean', 'any'].indexOf(field.type) < 0) {
-      return -1;
-    }
-    return 0;
   }
 }
 
