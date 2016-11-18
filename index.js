@@ -23,6 +23,10 @@ class MongoDatabaseStore {
       this._onInitHandlers.push(handler);
     }
   }
+  __collectStatus() {
+    return 'todo: collect mongodb status';
+  }
+
   init() {
     return new Promise((resolve, reject) => {
       this.logger.sdebug('mongodb', 'Init connect:', this._url);
@@ -46,7 +50,7 @@ class MongoDatabaseStore {
             } else if (err.type === 'info') {
               this.logger.sinfo('mongodb', err.message);   
             } else if (err.type === 'error') {
-              this.logger.serror('mongodb', err.message);   
+              this.logger.serror('mongodb', err.message);
             } else if (err.type === 'warn') {
               this.logger.swarn('mongodb', err.message);   
             }
@@ -62,7 +66,7 @@ class MongoDatabaseStore {
   }
   close() {
     if (this._closed || !this._db) {
-      return;
+      return Promise.resolve();
     }
     this._closed = true;
     return this._db.close(true);
