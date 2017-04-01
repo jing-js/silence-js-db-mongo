@@ -1,12 +1,18 @@
 'use strict';
 
-const MongoClient = require('mongodb').MongoClient;
-const MongoLogger = require('mongodb').Logger;
+const mongo = require('mongodb');
+const MongoClient = mongo.MongoClient;
+const MongoLogger = mongo.Logger;
+const ObjectID = mongo.ObjectID;
+const Long = mongo.Long;
 const path = require('path');
 const CWD = process.cwd();
 const fs = require('fs');
 
 class MongoDatabaseStore {
+  static get LIB_MONGODB() {
+    return mongo;
+  }
   constructor(config) {
     this.logger = config.logger;
     this._db = null;
@@ -81,5 +87,6 @@ class MongoDatabaseStore {
     return this._db.command(cmd);
   }
 }
+
 
 module.exports = MongoDatabaseStore;
